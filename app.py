@@ -76,17 +76,17 @@ def generate_image(model: nn.Module, z: torch.Tensor, truncation_psi: float,
 
 
 @torch.inference_mode()
-def generate_interpolated_images(seed0: int, seed1: int, num_intermediate: int,
-                                 psi0: float, psi1: float,
-                                 randomize_noise: bool, model: nn.Module,
-                                 device: torch.device) -> np.ndarray:
+def generate_interpolated_images(
+        seed0: int, seed1: int, num_intermediate: int, psi0: float,
+        psi1: float, randomize_noise: bool, model: nn.Module,
+        device: torch.device) -> tuple[list[np.ndarray], np.ndarray]:
     seed0 = int(np.clip(seed0, 0, np.iinfo(np.uint32).max))
     seed1 = int(np.clip(seed1, 0, np.iinfo(np.uint32).max))
 
     z0 = generate_z(model.style_dim, seed0, device)
     if num_intermediate == -1:
         out = generate_image(model, z0, psi0, randomize_noise)
-        return out
+        return [out], None
 
     z1 = generate_z(model.style_dim, seed1, device)
     vec = z1 - z0
@@ -98,8 +98,8 @@ def generate_interpolated_images(seed0: int, seed1: int, num_intermediate: int,
     for z, psi in zip(zs, psis):
         out = generate_image(model, z, psi, randomize_noise)
         res.append(out)
-    res = np.hstack(res)
-    return res
+    concatenated = np.hstack(res)
+    return res, concatenated
 
 
 def main():
@@ -129,7 +129,7 @@ def main():
             gr.inputs.Number(default=29703, label='Seed 1'),
             gr.inputs.Number(default=55376, label='Seed 2'),
             gr.inputs.Slider(-1,
-                             11,
+                             21,
                              step=1,
                              default=3,
                              label='Number of Intermediate Frames'),
@@ -139,7 +139,11 @@ def main():
                 0, 2, step=0.05, default=0.7, label='Truncation psi 2'),
             gr.inputs.Checkbox(default=False, label='Randomize Noise'),
         ],
-        gr.outputs.Image(type='numpy', label='Output'),
+        [
+            gr.outputs.Carousel(gr.outputs.Image(type='numpy'),
+                                label='Output Images'),
+            gr.outputs.Image(type='numpy', label='Concatenated'),
+        ],
         examples=examples,
         title=TITLE,
         description=DESCRIPTION,
