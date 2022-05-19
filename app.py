@@ -22,8 +22,18 @@ sys.path.insert(0, 'stylegan2-pytorch')
 from model import Generator
 
 TITLE = 'TADNE (This Anime Does Not Exist) Interpolation'
-DESCRIPTION = 'The original TADNE site is https://thisanimedoesnotexist.ai/.'
-ARTICLE = None
+DESCRIPTION = '''The original TADNE site is https://thisanimedoesnotexist.ai/.
+
+Expected execution time on Hugging Face Spaces: 4s for each image
+
+Related Apps:
+- [TADNE](https://huggingface.co/spaces/hysts/TADNE)
+- [TADNE Image Viewer](https://huggingface.co/spaces/hysts/TADNE-image-viewer)
+- [TADNE Image Selector](https://huggingface.co/spaces/hysts/TADNE-image-selector)
+- [TADNE Interpolation](https://huggingface.co/spaces/hysts/TADNE-interpolation)
+- [TADNE Image Search with DeepDanbooru](https://huggingface.co/spaces/hysts/TADNE-image-search-with-DeepDanbooru)
+'''
+ARTICLE = '<center><img src="https://visitor-badge.glitch.me/badge?page_id=hysts.tadne-interpolation" alt="visitor badge"/></center>'
 
 TOKEN = os.environ['TOKEN']
 
