@@ -103,8 +103,6 @@ def generate_interpolated_images(
 
 
 def main():
-    gr.close_all()
-
     args = parse_args()
     device = torch.device(args.device)
 
