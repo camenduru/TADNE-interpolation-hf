@@ -48,7 +48,6 @@ def parse_args() -> argparse.Namespace:
                         dest='enable_queue',
                         action='store_false')
     parser.add_argument('--allow-flagging', type=str, default='never')
-    parser.add_argument('--allow-screenshot', action='store_true')
     return parser.parse_args()
 
 
@@ -88,7 +87,7 @@ def generate_image(model: nn.Module, z: torch.Tensor, truncation_psi: float,
 def generate_interpolated_images(
         seed0: int, seed1: int, num_intermediate: int, psi0: float,
         psi1: float, randomize_noise: bool, model: nn.Module,
-        device: torch.device) -> tuple[list[np.ndarray], np.ndarray]:
+        device: torch.device) -> list[np.ndarray]:
     seed0 = int(np.clip(seed0, 0, np.iinfo(np.uint32).max))
     seed1 = int(np.clip(seed1, 0, np.iinfo(np.uint32).max))
 
@@ -107,8 +106,7 @@ def generate_interpolated_images(
     for z, psi in zip(zs, psis):
         out = generate_image(model, z, psi, randomize_noise)
         res.append(out)
-    concatenated = np.hstack(res)
-    return res, concatenated
+    return res
 
 
 def main():
@@ -146,19 +144,15 @@ def main():
                 0, 2, step=0.05, default=0.7, label='Truncation psi 2'),
             gr.inputs.Checkbox(default=False, label='Randomize Noise'),
         ],
-        [
-            gr.outputs.Carousel(gr.outputs.Image(type='numpy'),
-                                label='Output Images'),
-            gr.outputs.Image(type='numpy', label='Concatenated'),
-        ],
+        gr.Gallery(type='numpy', label='Output Images'),
         examples=examples,
         title=TITLE,
         description=DESCRIPTION,
         article=ARTICLE,
         theme=args.theme,
-        allow_screenshot=args.allow_screenshot,
         allow_flagging=args.allow_flagging,
         live=args.live,
+        cache_examples=False,
     ).launch(
         enable_queue=args.enable_queue,
         server_port=args.port,
