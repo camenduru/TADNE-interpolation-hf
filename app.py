@@ -34,8 +34,6 @@ Related Apps:
 '''
 ARTICLE = '<center><img src="https://visitor-badge.glitch.me/badge?page_id=hysts.tadne-interpolation" alt="visitor badge"/></center>'
 
-TOKEN = os.environ['TOKEN']
-
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
@@ -54,8 +52,7 @@ def parse_args() -> argparse.Namespace:
 def load_model(device: torch.device) -> nn.Module:
     model = Generator(512, 1024, 4, channel_multiplier=2)
     path = hf_hub_download('hysts/TADNE',
-                           'models/aydao-anime-danbooru2019s-512-5268480.pt',
-                           use_auth_token=TOKEN)
+                           'models/aydao-anime-danbooru2019s-512-5268480.pt')
     checkpoint = torch.load(path)
     model.load_state_dict(checkpoint['g_ema'])
     model.eval()
@@ -84,10 +81,10 @@ def generate_image(model: nn.Module, z: torch.Tensor, truncation_psi: float,
 
 
 @torch.inference_mode()
-def generate_interpolated_images(
-        seed0: int, seed1: int, num_intermediate: int, psi0: float,
-        psi1: float, randomize_noise: bool, model: nn.Module,
-        device: torch.device) -> list[np.ndarray]:
+def generate_interpolated_images(seed0: int, seed1: int, num_intermediate: int,
+                                 psi0: float, psi1: float,
+                                 randomize_noise: bool, model: nn.Module,
+                                 device: torch.device) -> list[np.ndarray]:
     seed0 = int(np.clip(seed0, 0, np.iinfo(np.uint32).max))
     seed1 = int(np.clip(seed1, 0, np.iinfo(np.uint32).max))
 
