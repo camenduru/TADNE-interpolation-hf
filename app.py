@@ -15,7 +15,8 @@ import torch.nn as nn
 from huggingface_hub import hf_hub_download
 
 if os.environ.get('SYSTEM') == 'spaces':
-    subprocess.call('git apply ../patch'.split(), cwd='stylegan2-pytorch')
+    with open('patch') as f:
+        subprocess.run('patch -p1'.split(), cwd='stylegan2-pytorch', stdin=f)
 
 sys.path.insert(0, 'stylegan2-pytorch')
 
